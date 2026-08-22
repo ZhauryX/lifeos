@@ -126,7 +126,7 @@ function calculateStreak(tasks: Task[]): number {
     
     if (diffDays === streak) {
       streak++;
-      currentDate.setDate(currentDate.getDate() - 1);
+      currentDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
     } else if (diffDays > streak) {
       break;
     }

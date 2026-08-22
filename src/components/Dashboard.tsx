@@ -30,9 +30,9 @@ const categoryColors: Record<string, string> = {
 };
 
 export function Dashboard() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [settings, setSettings] = useState<SettingsType>({ availableMinutes: 120, theme: "system", focusSound: true, autoStartBreak: false });
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [tasks, setTasks] = useState<Task[]>(() => getTasks());
+  const [settings, setSettings] = useState<SettingsType>(() => getSettings());
+  const [categories, setCategories] = useState<Category[]>(() => getCategories());
   const [scoredTasks, setScoredTasks] = useState<ScoredTask[]>([]);
   const [nextMove, setNextMove] = useState<ScoredTask | null>(null);
   const [totalWorkload, setTotalWorkload] = useState(0);
@@ -61,14 +61,9 @@ export function Dashboard() {
   }, []);
 
   useEffect(() => {
-    const loadedTasks = getTasks();
-    const loadedSettings = getSettings();
-    const loadedCategories = getCategories();
-    setTasks(loadedTasks);
-    setSettings(loadedSettings);
-    setCategories(loadedCategories);
-    refreshScores(loadedTasks, loadedSettings.availableMinutes);
-  }, [refreshScores]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refreshScores(tasks, settings.availableMinutes);
+  }, [tasks, settings.availableMinutes, refreshScores]);
 
   const handleAddTask = (task: Omit<Task, "id" | "createdAt">) => {
     addTask(task);

@@ -17,10 +17,11 @@ export function FocusTimer({ task, onComplete, soundEnabled }: FocusTimerProps) 
   const [showMinutes, setShowMinutes] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const initialTime = task ? task.estimatedMinutes * 60 : 0;
+  const taskIdRef = useRef<string | null>(task?.id || null);
 
   useEffect(() => {
-    if (task) {
+    if (task && task.id !== taskIdRef.current) {
+      taskIdRef.current = task.id;
       setTimeLeft(task.estimatedMinutes * 60);
       setIsRunning(false);
       setCompleted(false);
@@ -62,7 +63,7 @@ export function FocusTimer({ task, onComplete, soundEnabled }: FocusTimerProps) 
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const progress = initialTime > 0 ? ((initialTime - timeLeft) / initialTime) * 100 : 0;
+  const progress = task ? ((task.estimatedMinutes * 60 - timeLeft) / (task.estimatedMinutes * 60)) * 100 : 0;
 
   if (!task) {
     return (
@@ -123,7 +124,7 @@ export function FocusTimer({ task, onComplete, soundEnabled }: FocusTimerProps) 
               Mark Done
             </button>
             <button
-              onClick={() => { setCompleted(false); setTimeLeft(initialTime); }}
+              onClick={() => { setCompleted(false); setTimeLeft(task.estimatedMinutes * 60); }}
               className="px-6 py-3 rounded-xl bg-white/10 text-white font-medium hover:bg-white/20 transition-colors flex items-center gap-2"
             >
               <RotateCcw className="w-5 h-5" />
@@ -147,7 +148,7 @@ export function FocusTimer({ task, onComplete, soundEnabled }: FocusTimerProps) 
               {isRunning ? "Pause" : "Start Focus"}
             </button>
             <button
-              onClick={() => setTimeLeft(Math.min(initialTime, timeLeft + 60))}
+              onClick={() => setTimeLeft(Math.min(task.estimatedMinutes * 60, timeLeft + 60))}
               className="p-3 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-colors"
               title="+1 min"
             >
@@ -171,7 +172,7 @@ export function FocusTimer({ task, onComplete, soundEnabled }: FocusTimerProps) 
         </button>
         <div className="flex-1" />
         <button
-          onClick={() => { setIsRunning(false); setTimeLeft(initialTime); }}
+          onClick={() => { setIsRunning(false); setTimeLeft(task.estimatedMinutes * 60); }}
           className="px-4 py-2 rounded-lg bg-white/10 text-white text-sm hover:bg-white/20 transition-colors flex items-center gap-2"
         >
           <RotateCcw className="w-4 h-4" />
